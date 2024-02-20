@@ -57,6 +57,9 @@ class ManageDatasets():
 		x_test = x_test[index_test]
 		y_test = y_test[index_test]
 
+		if self.dataset_name in ['MNIST','CIFAR10', 'CIFAR100', 'FMNIST']:
+			x_train = x_train/255
+			x_test = x_test/255
 
 		return (x_train, y_train), (x_test, y_test)
 
