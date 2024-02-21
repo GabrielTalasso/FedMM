@@ -29,7 +29,7 @@ class ManageDatasets():
 													as_supervised=True,
 												))
 		else:
-			dataset = self.get_dataset_from_keras(self.dataset_name)      
+			dataset = self.get_dataset_from_keras()      
 			(x_train, y_train), (x_test, y_test) = dataset.load_data()	
 
 		n_classes = len(np.unique(y_train)) #number of classes in dataset
@@ -70,7 +70,7 @@ class ManageDatasets():
 			x_train = x_train/255
 			x_test = x_test/255
 
-		return (x_train, y_train), (x_test, y_test)
+		return x_train, y_train, x_test, y_test
 
 
 	def load_UCIHAR(self):

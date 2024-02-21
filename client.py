@@ -52,8 +52,7 @@ class ClientBase(fl.client.NumPyClient):
 		self.n_clusters = n_clusters
 
 	def load_data(self):
-		return ManageDatasets(self.cid, dataset_name=self.dataset).select_dataset(self.n_clients,
-																				  alpha = self.dir_alpha,
+		return ManageDatasets(self.cid, dataset_name=self.dataset).select_dataset(alpha = self.dir_alpha,
 																				  dataset_size = self.dataset_size)
 
 	def create_model(self):

@@ -45,7 +45,8 @@ class FedSCCS(fl.server.strategy.FedAvg):
                 metric_layer = -1,
                 n_clusters = 1,
                 POC_perc_of_clients = 0.5,
-                decay_factor = 0.1
+                decay_factor = 0.1,
+                dataset_n_classes = 10
                 ):
 
     self.model_name = model_name
@@ -54,6 +55,7 @@ class FedSCCS(fl.server.strategy.FedAvg):
     self.clustering = clustering
     self.clustering_round = clustering_round
     self.dataset = dataset
+    self.dataset_n_classes = dataset_n_classes
 
     self.selection_method = selection_method
     self.POC_perc_of_clients = POC_perc_of_clients
@@ -120,10 +122,10 @@ class FedSCCS(fl.server.strategy.FedAvg):
       input_shape = self.x_servidor.shape
 
       if self.model_name == 'DNN':
-        return ModelCreation().create_DNN(input_shape, 8)
+        return ModelCreation().create_DNN(input_shape, self.dataset_n_classes)
 
       elif self.model_name == 'CNN':
-        return ModelCreation().create_CNN(input_shape, 10)
+        return ModelCreation().create_CNN(input_shape, self.dataset_n_classes)
 
     modelo = create_model(self)
 
