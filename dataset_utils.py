@@ -1,4 +1,5 @@
 import tensorflow as tf
+import tensorflow_datasets as tfds
 import numpy as np
 import random
 import pickle
@@ -20,9 +21,17 @@ class ManageDatasets():
 		alpha, #param of dirichlet distribuition
 		test_size = 0.2): # proportion of dataset to use as test set
 
+		if self.dataset_name == 'EMNIST':
+			(x_train, y_train), (x_test, y_test) = tfds.as_numpy(tfds.load(
+													'emnist/balanced',
+													split=['train', 'test'],
+													batch_size=-1,
+													as_supervised=True,
+												))
+		else:
+			dataset = self.get_dataset_from_keras(self.dataset_name)      
+			(x_train, y_train), (x_test, y_test) = dataset.load_data()	
 
-		dataset = self.get_dataset_from_keras(self.dataset_name)      
-		(x_train, y_train), (x_test, y_test) = dataset.load_data()
 		n_classes = len(np.unique(y_train)) #number of classes in dataset
 
 		alpha_vector = alpha * np.ones(n_classes)
@@ -159,5 +168,7 @@ class ManageDatasets():
 		elif self.dataset_name == 'UCIHAR':
 			return self.load_UCIHAR()
 			
-		elif self.dataset_name in ['MNIST','CIFAR10', 'CIFAR100', 'FMNIST', 'IMDB', 'REUTERS']:
+		elif self.dataset_name in ['MNIST','CIFAR10', 'CIFAR100',
+							 	   'FMNIST', 'IMDB', 'REUTERS',
+								   'EMNIST']:
 			return self.load_from_keras(dataset_size = dataset_size, alpha = alpha, test_size=test_size)
