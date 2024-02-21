@@ -2,7 +2,6 @@
 
 import flwr as fl
 import tensorflow as tf
-import torch
 from logging import WARNING
 from flwr.server.strategy.aggregate import aggregate, weighted_loss_avg
 from flwr.server.strategy.strategy import Strategy

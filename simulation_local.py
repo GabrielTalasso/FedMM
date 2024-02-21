@@ -18,7 +18,7 @@ try:
 except FileNotFoundError:
 	pass
 
-dataset_name = 'MotionSense'
+dataset_name = 'MNIST'
 selection_method = 'All' #Random, POC, All, Less_Selected
 cluster_metric = 'CKA' #CKA, weights
 metric_layer = -1 #-1, -2, 1
@@ -29,14 +29,12 @@ n_rounds = 10
 n_clusters = 2
 clustering = True
 cluster_round = 2
-non_iid = True
-Xnon_iid = True
 
 #verificacao de redundancia
 def funcao_cliente(cid):
 	return ClientBase(int(cid), n_clients=n_clients,
-		    dataset=dataset_name, non_iid=non_iid, model_name = 'DNN',
-			local_epochs = 1, n_rounds = n_rounds, n_clusters = n_clusters, Xnon_iid=Xnon_iid,
+		    dataset=dataset_name, model_name = 'DNN',
+			local_epochs = 1, n_rounds = n_rounds, n_clusters = n_clusters,
 			selection_method = selection_method, 
 			POC_perc_of_clients = POC_perc_of_clients,
 			cluster_metric = cluster_metric,
