@@ -46,7 +46,8 @@ class FedSCCS(fl.server.strategy.FedAvg):
                 n_clusters = 1,
                 POC_perc_of_clients = 0.5,
                 decay_factor = 0.1,
-                dataset_n_classes = 10
+                dataset_n_classes = 10,
+                dir_alpha = 100
                 ):
 
     self.model_name = model_name
@@ -56,6 +57,7 @@ class FedSCCS(fl.server.strategy.FedAvg):
     self.clustering_round = clustering_round
     self.dataset = dataset
     self.dataset_n_classes = dataset_n_classes
+    self.dir_alpha = dir_alpha
 
     self.selection_method = selection_method
     self.POC_perc_of_clients = POC_perc_of_clients
@@ -178,9 +180,9 @@ class FedSCCS(fl.server.strategy.FedAvg):
                                 n_clusters=self.n_clusters, 
                                 server_round = server_round,
                                 cluster_round = self.clustering_round,
-                                path = f'local_logs/{self.dataset}/{self.cluster_metric}-({self.metric_layer})-{self.cluster_method}-{self.selection_method}-{self.POC_perc_of_clients}/')
+                                path = f'local_logs/{self.dataset}/alpha_{self.dir_alpha}/{self.cluster_metric}-({self.metric_layer})-{self.cluster_method}-{self.selection_method}-{self.POC_perc_of_clients}/')
 
-        filename = f"local_logs/{self.dataset}/{self.cluster_metric}-({self.metric_layer})-{self.cluster_method}-{self.selection_method}-{self.POC_perc_of_clients}/clusters_{self.n_clients}clients_{self.n_clusters}clusters.txt"
+        filename = f"local_logs/{self.dataset}/alpha_{self.dir_alpha}/{self.cluster_metric}-({self.metric_layer})-{self.cluster_method}-{self.selection_method}-{self.POC_perc_of_clients}/clusters_{self.n_clients}clients_{self.n_clusters}clusters.txt"
         os.makedirs(os.path.dirname(filename), exist_ok=True)
         with open(filename, 'a') as arq:
           arq.write(f"{self.idx} - round{server_round}\n")

@@ -1,2 +1,3 @@
 *.cpython-38*
+*.cpython-310*
 venvs

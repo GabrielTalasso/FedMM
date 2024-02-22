@@ -24,11 +24,12 @@ cluster_metric = 'CKA' #CKA, weights
 metric_layer = -1 #-1, -2, 1
 cluster_method = 'HC' #Affinity, HC, KCenter, Random
 POC_perc_of_clients = 0.5
-n_clients = 5
+n_clients = 25
 n_rounds = 10
-n_clusters = 2
+n_clusters = 1
 clustering = True
 cluster_round = 2
+dir_alpha = 0.1
 
 #verificacao de redundancia
 def funcao_cliente(cid):
@@ -39,7 +40,8 @@ def funcao_cliente(cid):
 			POC_perc_of_clients = POC_perc_of_clients,
 			cluster_metric = cluster_metric,
 			metric_layer = metric_layer,
-			cluster_method = cluster_method)
+			cluster_method = cluster_method,
+			dir_alpha = dir_alpha)
 
 history = fl.simulation.start_simulation(client_fn=funcao_cliente, 
 								num_clients=n_clients, 
@@ -50,7 +52,8 @@ history = fl.simulation.start_simulation(client_fn=funcao_cliente,
 													POC_perc_of_clients = POC_perc_of_clients,
 													cluster_metric = cluster_metric,
 													metric_layer = metric_layer,
-													cluster_method = cluster_method),
+													cluster_method = cluster_method,
+													dir_alpha = dir_alpha),
 								config=fl.server.ServerConfig(n_rounds))
 
 with open('./results/history_simulation.pickle', 'wb') as file:
