@@ -36,7 +36,7 @@ from model_definition import ModelCreation
 
 from sys import getsizeof
 
-class FedSCCS(fl.server.strategy.FedAvg):
+class FedMM(fl.server.strategy.FedAvg):
 
   def __init__(self, model_name, n_clients,
                 clustering, clustering_round, dataset, 
