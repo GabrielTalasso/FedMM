@@ -11,6 +11,7 @@ from scipy.stats import wasserstein_distance
 import numpy as np
 import random
 import os
+import json
 
 from dataset_utils import ManageDatasets
 from model_definition import ModelCreation
@@ -45,15 +46,27 @@ class ClientBase(fl.client.NumPyClient):
 		self.metric_layer = metric_layer
 		self.cluster_method = cluster_method
 
-		self.x_train, self.y_train, self.x_test, self.y_test = self.load_data()
-		self.model     = self.create_model()
-
 		self.n_rounds = n_rounds
 		self.n_clusters = n_clusters
+
+		self.x_train, self.y_train, self.x_test, self.y_test = self.load_data()
+		self.model     = self.create_model()
+		self.save_class_quantities()
+
 
 	def load_data(self):
 		return ManageDatasets(self.cid, dataset_name=self.dataset).select_dataset(alpha = self.dir_alpha,
 																				  dataset_size = self.dataset_size)
+
+	def save_class_quantities(self):
+		classes, counts = np.unique(self.y_train, return_counts=True)
+
+		filename = f'local_logs/{self.dataset}/alpha_{self.dir_alpha}/{self.cluster_metric}-({self.metric_layer})-{self.cluster_method}-{self.selection_method}-{self.POC_perc_of_clients}'
+		filename = f"{filename}/class_quantities_{self.n_clients}clients_{self.n_clusters}clusters.csv"
+		os.makedirs(os.path.dirname(filename), exist_ok=True)
+		with open(filename, "a") as f:
+			for classe, count in zip(classes, counts): 
+				f.write(f"{self.cid}, {classe}, {count}\n")
 
 	def create_model(self):
 		input_shape = self.x_train.shape
