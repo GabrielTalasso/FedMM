@@ -30,10 +30,10 @@ class ModelCreation():
 	def create_CNN(self, input_shape, num_classes):
 		
 		deep_cnn = Sequential()
-		deep_cnn.add(Conv1D(filters=32, kernel_size=3, activation='relu',kernel_initializer='he_uniform', input_shape=(input_shape[1], 1)))
-		deep_cnn.add(Conv1D(filters=32, kernel_size=3, activation='relu',kernel_initializer='he_uniform'))
-		deep_cnn.add(Dropout(0.6))
-		deep_cnn.add(MaxPooling1D(pool_size=2))
+		deep_cnn.add(Conv2D(filters=32, kernel_size=3, activation='relu',kernel_initializer='he_uniform', input_shape=input_shape[1:]))
+		deep_cnn.add(Conv2D(filters=32, kernel_size=3, activation='relu',kernel_initializer='he_uniform'))
+		deep_cnn.add(Dropout(0.2))
+		deep_cnn.add(Conv2D(filters=32, kernel_size=3, activation='relu',kernel_initializer='he_uniform'))
 		deep_cnn.add(Flatten())
 		deep_cnn.add(Dense(50, activation='relu'))
 		deep_cnn.add(Dense(num_classes, activation='softmax'))
