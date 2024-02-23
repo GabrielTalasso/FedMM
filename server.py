@@ -2,6 +2,7 @@
 
 import flwr as fl
 import tensorflow as tf
+import tensorflow_datasets as tfds
 from logging import WARNING
 from flwr.server.strategy.aggregate import aggregate, weighted_loss_avg
 from flwr.server.strategy.strategy import Strategy
@@ -81,6 +82,17 @@ class FedMM(fl.server.strategy.FedAvg):
       (x_servidor, _), (_, _) = tf.keras.datasets.mnist.load_data()
       x_servidor = x_servidor/255.0
       x_servidor = x_servidor[list(np.random.random_integers(1,60000-1, 1000))]
+      self.x_servidor = x_servidor#.reshape(x_servidor.shape[0] , 28*28)
+
+    if dataset == 'EMNIST':
+      (x_servidor, _), (_, _) =  tfds.as_numpy(tfds.load(
+													'emnist/balanced',
+													split=['train', 'test'],
+													batch_size=-1,
+													as_supervised=True,
+												))
+      x_servidor = x_servidor/255.0
+      x_servidor = x_servidor[list(np.random.random_integers(1,100000-1, 1000))]
       self.x_servidor = x_servidor#.reshape(x_servidor.shape[0] , 28*28) 
 
     if dataset == 'CIFAR10':
@@ -182,10 +194,11 @@ class FedMM(fl.server.strategy.FedAvg):
                                 cluster_round = self.clustering_round,
                                 path = f'local_logs/{self.dataset}/alpha_{self.dir_alpha}/{self.cluster_metric}-({self.metric_layer})-{self.cluster_method}-{self.selection_method}-{self.POC_perc_of_clients}/')
 
-        filename = f"local_logs/{self.dataset}/alpha_{self.dir_alpha}/{self.cluster_metric}-({self.metric_layer})-{self.cluster_method}-{self.selection_method}-{self.POC_perc_of_clients}/clusters_{self.n_clients}clients_{self.n_clusters}clusters.txt"
+        filename = f"local_logs/{self.dataset}/alpha_{self.dir_alpha}/{self.cluster_metric}-({self.metric_layer})-{self.cluster_method}-{self.selection_method}-{self.POC_perc_of_clients}/clusters_{self.n_clients}clients_{self.n_clusters}clusters.csv"
         os.makedirs(os.path.dirname(filename), exist_ok=True)
         with open(filename, 'a') as arq:
-          arq.write(f"{self.idx} - round{server_round}\n")
+          for i in range(len(self.idx)):
+            arq.write(f"{i}, {self.idx[i]}, {server_round}\n")
         
     #aggregation params for each cluster
     parameters_aggregated = {}
