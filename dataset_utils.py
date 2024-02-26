@@ -5,6 +5,7 @@ import random
 import pickle
 import pandas as pd
 from scipy.stats import dirichlet, multinomial
+import os
 #from sklearn.preprocessing import Normalizer
 
 import logging
@@ -16,21 +17,11 @@ class ManageDatasets():
 		self.cid = cid
 		self.dataset_name = dataset_name
 
-	def load_from_keras(self,
-		dataset_size, #for each client
-		alpha, #param of dirichlet distribuition
-		test_size = 0.2): # proportion of dataset to use as test set
-
-		if self.dataset_name == 'EMNIST':
-			(x_train, y_train), (x_test, y_test) = tfds.as_numpy(tfds.load(
-													'emnist/balanced',
-													split=['train', 'test'],
-													batch_size=-1,
-													as_supervised=True,
-												))
-		else:
-			dataset = self.get_dataset_from_keras()      
-			(x_train, y_train), (x_test, y_test) = dataset.load_data()	
+	def generate_datasets(self, y_train, y_test, alpha, dataset_size, test_size):
+		"""
+		Generates a heterogeneous dataset (non-IID) based on the information required from the simulation. 
+		Returns pickle files with indexes of unbalanced data from keras datasets.
+		"""
 
 		n_classes = len(np.unique(y_train)) #number of classes in dataset
 
@@ -56,6 +47,55 @@ class ManageDatasets():
 									np.random.choice(np.where(y_test == i)[0], int(n * test_size)))
 			except ValueError:
 				pass
+
+		index_train = index_train.astype(int)
+		index_test = index_test.astype(int)
+
+		filename = f"data/{self.dataset_name}/{alpha}/train/{self.cid}"
+		os.makedirs(os.path.dirname(filename), exist_ok=True)
+		with open(filename, 'wb') as file:
+			pickle.dump(index_train, file)
+
+		filename = f"data/{self.dataset_name}/{alpha}/test/{self.cid}"
+		os.makedirs(os.path.dirname(filename), exist_ok=True)
+		with open(filename, 'wb') as file:
+			pickle.dump(index_test, file)
+
+	def load_from_keras(self,
+		dataset_size, #for each client
+		alpha, #param of dirichlet distribuition
+		test_size = 0.2): # proportion of dataset to use as test set
+
+		"""
+		Read indexes from saved pickle files and load datasets based on these indexes.
+		If the index file does not yet exist for this case, it will be created.
+		"""
+
+		if self.dataset_name == 'EMNIST':
+			(x_train, y_train), (x_test, y_test) = tfds.as_numpy(tfds.load(
+													'emnist/balanced',
+													split=['train', 'test'],
+													batch_size=-1,
+													as_supervised=True,
+												))
+		else:
+			dataset = self.get_dataset_from_keras()      
+			(x_train, y_train), (x_test, y_test) = dataset.load_data()	
+
+		try: #try to read the idex files
+			filename = f"data/{self.dataset_name}/{alpha}/train/{self.cid}"
+			with open(filename, 'rb') as file:
+				index_train = pickle.load(file)
+
+		except FileNotFoundError: #if necessary, create one
+			self.generate_datasets(y_train, y_test, alpha, dataset_size, test_size)
+			filename = f"data/{self.dataset_name}/{alpha}/train/{self.cid}"
+			with open(filename, 'rb') as file:
+				index_train = pickle.load(file)
+
+		filename = f"data/{self.dataset_name}/{alpha}/test/{self.cid}" #same for test set
+		with open(filename, 'rb') as file:
+			index_test = pickle.load(file)
 		
 		index_train = index_train.astype(int)
 		index_test = index_test.astype(int)
