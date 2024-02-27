@@ -167,7 +167,7 @@ class FedMM(fl.server.strategy.FedAvg):
           weights_results[str(idx_cluster)] = []
       weights_results[str(idx_cluster)].append((parameters_to_ndarrays(fit_res.parameters), fit_res.num_examples))
 
-      #collect activations and weights of last-layer of clients's model (or any other layer difined in metric_layer)
+      #collect activations and weights of last-layer of clients's model (or any other layer defined in metric_layer)
       w = lista_modelos['models'][str(idx_cluster)][-1]#
       modelo.set_weights(w)#
       activation_last = get_layer_outputs(modelo, modelo.layers[self.metric_layer], self.x_servidor, 0)#

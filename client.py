@@ -29,8 +29,8 @@ class ClientBase(fl.client.NumPyClient):
 		  dataset_n_classes = 10):
 
 		self.cid = cid
-		self.round = 0
 		self.n_clients = n_clients
+		self.round = 1
 
 		self.dataset = dataset
 		self.dir_alpha = dir_alpha #dirichlet alpha
@@ -59,6 +59,7 @@ class ClientBase(fl.client.NumPyClient):
 																				  dataset_size = self.dataset_size)
 
 	def save_class_quantities(self):
+
 		classes, counts = np.unique(self.y_train, return_counts=True)
 
 		filename = f'local_logs/{self.dataset}/alpha_{self.dir_alpha}/{self.cluster_metric}-({self.metric_layer})-{self.cluster_method}-{self.selection_method}-{self.POC_perc_of_clients}'
@@ -66,7 +67,7 @@ class ClientBase(fl.client.NumPyClient):
 		os.makedirs(os.path.dirname(filename), exist_ok=True)
 		with open(filename, "a") as f:
 			for classe, count in zip(classes, counts): 
-				f.write(f"{self.cid}, {classe}, {count}\n")
+				f.write(f"{self.cid}, {classe}, {count}, {self.round}\n")
 
 	def create_model(self):
 		input_shape = self.x_train.shape
@@ -91,7 +92,7 @@ class ClientBase(fl.client.NumPyClient):
 		msg2server = {
 				"cliente_id": self.cid,
 		}
-		self.round += 1
+		self.round = config['round']
 	
 		filename = f"local_logs/{self.dataset}/alpha_{self.dir_alpha}/{self.cluster_metric}-({self.metric_layer})-{self.cluster_method}-{self.selection_method}-{self.POC_perc_of_clients}/train/acc_{self.n_clients}clients_{self.n_clusters}clusters.csv"
 		os.makedirs(os.path.dirname(filename), exist_ok=True)
