@@ -26,16 +26,17 @@ class ModelCreation():
 
 		return model
 
-
 	def create_CNN(self, input_shape, num_classes):
 		
 		deep_cnn = Sequential()
-		deep_cnn.add(Conv2D(filters=32, kernel_size=3, activation='relu',kernel_initializer='he_uniform', input_shape=input_shape[1:]))
+		deep_cnn.add(Conv2D(filters=64, kernel_size=3, activation='relu',kernel_initializer='he_uniform', input_shape=input_shape[1:]))
+		deep_cnn.add(Dropout(0.3))
 		deep_cnn.add(Conv2D(filters=32, kernel_size=3, activation='relu',kernel_initializer='he_uniform'))
-		deep_cnn.add(Dropout(0.2))
+		deep_cnn.add(Dropout(0.3))
 		deep_cnn.add(Conv2D(filters=32, kernel_size=3, activation='relu',kernel_initializer='he_uniform'))
 		deep_cnn.add(Flatten())
-		deep_cnn.add(Dense(50, activation='relu'))
+		deep_cnn.add(Dense(128, activation='relu'))
+		deep_cnn.add(Dense(64, activation='relu'))
 		deep_cnn.add(Dense(num_classes, activation='softmax'))
 	
 		deep_cnn.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
