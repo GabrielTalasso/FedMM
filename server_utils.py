@@ -5,6 +5,9 @@ import matplotlib.pyplot as plt
 import os
 import pandas as pd
 
+import tensorflow as tf
+import tensorflow_datasets as tfds
+
 import numpy as np
 import random
 import threading
@@ -321,108 +324,108 @@ def sample(
 
     return [clients[cid] for cid in sampled_cids]
 
-# def load_server_data(dataset_name, server_dataset_size, server_data_type = 'data'):
+def load_server_data(dataset_name, server_dataset_size, server_dataset_type = 'data'):
 
-#     if server_data_type == 'data':
+    if server_dataset_type == 'data':
 
-#         if dataset_name == 'MNIST':
-#             (x_servidor, _), (_, _) = tf.keras.datasets.mnist.load_data()
-#             x_servidor = x_servidor/255.0
-#             x_servidor = x_servidor[list(np.random.random_integers(1,60000-1, server_dataset_size))]
+        if dataset_name == 'MNIST':
+            (x_servidor, _), (_, _) = tf.keras.datasets.mnist.load_data()
+            x_servidor = x_servidor/255.0
+            x_servidor = x_servidor[list(np.random.random_integers(1,60000-1, server_dataset_size))]
 
-#         if dataset_name == 'EMNIST':
-#             (x_servidor, _), (_, _) =  tfds.as_numpy(tfds.load(
-#                                                             'emnist/balanced',
-#                                                             split=['train', 'test'],
-#                                                             batch_size=-1,
-#                                                             as_supervised=True,
-#                                                         ))
-#             x_servidor = x_servidor/255.0
-#             x_servidor = x_servidor[list(np.random.random_integers(1,100000-1, server_dataset_size))]
+        if dataset_name == 'EMNIST':
+            (x_servidor, _), (_, _) =  tfds.as_numpy(tfds.load(
+                                                            'emnist/balanced',
+                                                            split=['train', 'test'],
+                                                            batch_size=-1,
+                                                            as_supervised=True,
+                                                        ))
+            x_servidor = x_servidor/255.0
+            x_servidor = x_servidor[list(np.random.random_integers(1,100000-1, server_dataset_size))]
 
-#         if dataset_name == 'CIFAR10':
-#             (x_servidor, _), (_, _) = tf.keras.datasets.cifar10.load_data()
-#             x_servidor = x_servidor/255.0
-#             x_servidor = x_servidor[list(np.random.random_integers(1,50000-1, server_dataset_size))]
+        if dataset_name == 'CIFAR10':
+            (x_servidor, _), (_, _) = tf.keras.datasets.cifar10.load_data()
+            x_servidor = x_servidor/255.0
+            x_servidor = x_servidor[list(np.random.random_integers(1,50000-1, server_dataset_size))]
             
 
 
-#         if dataset_name == 'MotionSense':
-#             for cid in range(n_clients):
-#                 with open(f'data/motion_sense/{cid+1}_train.pickle', 'rb') as train_file:
-#                     if cid == 0:
-#                         train = pd.read_pickle(train_file)   
-#                         train = train.sample(100)
-#                     else:
-#                         train = pd.concat([train,  pd.read_pickle(train_file).sample(100)],
-#                                             ignore_index=True, sort = False)
+        if dataset_name == 'MotionSense':
+            for cid in range(n_clients):
+                with open(f'data/motion_sense/{cid+1}_train.pickle', 'rb') as train_file:
+                    if cid == 0:
+                        train = pd.read_pickle(train_file)   
+                        train = train.sample(100)
+                    else:
+                        train = pd.concat([train,  pd.read_pickle(train_file).sample(100)],
+                                            ignore_index=True, sort = False)
                     
-#             train.drop('activity', axis=1, inplace=True)
-#             train.drop('subject', axis=1, inplace=True)
-#             train.drop('trial', axis=1, inplace=True)
-#             x_servidor = train.values
+            train.drop('activity', axis=1, inplace=True)
+            train.drop('subject', axis=1, inplace=True)
+            train.drop('trial', axis=1, inplace=True)
+            x_servidor = train.values
 
-#         if dataset_name == 'ExtraSensory':
+        if dataset_name == 'ExtraSensory':
 
-#             for cid in range(n_clients):
-#                 with open(f'data/ExtraSensory/x_train_client_{cid+1}.pickle', 'rb') as train_file:
-#                     if cid == 0:
-#                         train = pd.read_pickle(train_file)   
-#                         train = train[:20]
-#                     else:
-#                         train = np.append(train,  pd.read_pickle(train_file)[:20],
-#                                             axis = 0)
+            for cid in range(n_clients):
+                with open(f'data/ExtraSensory/x_train_client_{cid+1}.pickle', 'rb') as train_file:
+                    if cid == 0:
+                        train = pd.read_pickle(train_file)   
+                        train = train[:20]
+                    else:
+                        train = np.append(train,  pd.read_pickle(train_file)[:20],
+                                            axis = 0)
                     
-#                 x_servidor = train
+                x_servidor = train
 
-#     if server_data_type == 'noise':
+    if server_dataset_type == 'noise':
 
-#         if dataset_name == 'MNIST':
-#             (x_servidor, _), (_, _) = tf.keras.datasets.mnist.load_data()
-#             shape = x_servidor.shape
-#             x_servidor = np.random.randint(0, 1, size=shape)
+        if dataset_name == 'MNIST':
+            (x_servidor, _), (_, _) = tf.keras.datasets.mnist.load_data()
+            shape = x_servidor.shape
+            x_servidor = np.random.randint(0, 1, size=shape)
             
-#         if dataset_name == 'EMNIST':
-#             (x_servidor, _), (_, _) =  tfds.as_numpy(tfds.load(
-#                                                             'emnist/balanced',
-#                                                             split=['train', 'test'],
-#                                                             batch_size=-1,
-#                                                             as_supervised=True,
-#                                                         ))
-#             shape = x_servidor.shape
-#             x_servidor = np.random.randint(0, 1, size=shape) 
+        if dataset_name == 'EMNIST':
+            (x_servidor, _), (_, _) =  tfds.as_numpy(tfds.load(
+                                                            'emnist/balanced',
+                                                            split=['train', 'test'],
+                                                            batch_size=-1,
+                                                            as_supervised=True,
+                                                        ))
+            shape = x_servidor.shape
+            x_servidor = np.random.randint(0, 1, size=shape) 
 
-#         if dataset_name == 'CIFAR10':
-#             (x_servidor, _), (_, _) = tf.keras.datasets.cifar10.load_data()
-#             shape = x_servidor.shape
-#             x_servidor = np.random.randint(0, 1, size=shape) 
+        if dataset_name == 'CIFAR10':
+            (x_servidor, _), (_, _) = tf.keras.datasets.cifar10.load_data()
+            shape = x_servidor.shape
+            x_servidor = np.random.randint(0, 1, size=shape) 
 
-#         if dataset_name == 'MotionSense':
-#             for cid in range(n_clients):
-#                 with open(f'data/motion_sense/{cid+1}_train.pickle', 'rb') as train_file:
-#                     if cid == 0:
-#                         train = pd.read_pickle(train_file)   
-#                         train = train.sample(100)
-#                     else:
-#                         train = pd.concat([train,  pd.read_pickle(train_file).sample(100)],
-#                                             ignore_index=True, sort = False)
+        if dataset_name == 'MotionSense':
+            for cid in range(n_clients):
+                with open(f'data/motion_sense/{cid+1}_train.pickle', 'rb') as train_file:
+                    if cid == 0:
+                        train = pd.read_pickle(train_file)   
+                        train = train.sample(100)
+                    else:
+                        train = pd.concat([train,  pd.read_pickle(train_file).sample(100)],
+                                            ignore_index=True, sort = False)
                     
-#             train.drop('activity', axis=1, inplace=True)
-#             train.drop('subject', axis=1, inplace=True)
-#             train.drop('trial', axis=1, inplace=True)
-#             x_servidor = train.values
+            train.drop('activity', axis=1, inplace=True)
+            train.drop('subject', axis=1, inplace=True)
+            train.drop('trial', axis=1, inplace=True)
+            x_servidor = train.values
 
-#         if dataset_name == 'ExtraSensory':
+        if dataset_name == 'ExtraSensory':
 
-#             for cid in range(n_clients):
-#                 with open(f'data/ExtraSensory/x_train_client_{cid+1}.pickle', 'rb') as train_file:
-#                     if cid == 0:
-#                         train = pd.read_pickle(train_file)   
-#                         train = train[:20]
-#                     else:
-#                         train = np.append(train,  pd.read_pickle(train_file)[:20],
-#                                             axis = 0)
+            for cid in range(n_clients):
+                with open(f'data/ExtraSensory/x_train_client_{cid+1}.pickle', 'rb') as train_file:
+                    if cid == 0:
+                        train = pd.read_pickle(train_file)   
+                        train = train[:20]
+                    else:
+                        train = np.append(train,  pd.read_pickle(train_file)[:20],
+                                            axis = 0)
                     
-#                 x_servidor = train
+                x_servidor = train
 
-#     return x_servidor
+    return x_servidor

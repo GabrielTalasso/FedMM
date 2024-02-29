@@ -21,18 +21,21 @@ except FileNotFoundError:
 dataset_name = 'CIFAR10'
 selection_method = 'All' #Random, POC, All, Less_Selected
 cluster_metric = 'CKA' #CKA, weights
-metric_layer = -2 #-1, -2, 1
+metric_layer = -1 #-1, -2, 1
 cluster_method = 'HC' #Affinity, HC, KCenter, Random
 POC_perc_of_clients = 0.5
 n_clients = 30
 n_rounds = 50
-n_clusters = 10
+n_clusters = 1
 clustering = True
 cluster_round = 5
 dir_alpha = 0.1
 dataset_n_classes = 10
 model_name = 'CNN'
 dataset_size = 1000
+server_dataset_type = 'noise'
+server_dataset_size = 1000
+
 
 def funcao_cliente(cid):
 	return ClientBase(int(cid), n_clients=n_clients,
@@ -58,7 +61,9 @@ history = fl.simulation.start_simulation(client_fn=funcao_cliente,
 													metric_layer = metric_layer,
 													cluster_method = cluster_method,
 													dir_alpha = dir_alpha,
-													dataset_n_classes = dataset_n_classes ),
+													dataset_n_classes = dataset_n_classes,
+													server_dataset_size = server_dataset_size,
+													server_dataset_type = server_dataset_type),
 								config=fl.server.ServerConfig(n_rounds))
 
 

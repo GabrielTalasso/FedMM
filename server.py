@@ -1,5 +1,3 @@
-"""## 2. Desenvolvendo Classe Servidor"""
-
 import flwr as fl
 import tensorflow as tf
 import tensorflow_datasets as tfds
@@ -48,7 +46,9 @@ class FedMM(fl.server.strategy.FedAvg):
                 POC_perc_of_clients = 0.5,
                 decay_factor = 0.1,
                 dataset_n_classes = 10,
-                dir_alpha = 100
+                dir_alpha = 100,
+                server_dataset_size = 1000,
+                server_dataset_type = 'data'
                 ):
 
     self.model_name = model_name
@@ -73,63 +73,16 @@ class FedMM(fl.server.strategy.FedAvg):
 
     self.idx = list(np.zeros(n_clients))
 
+    self.x_servidor = load_server_data(dataset_name = self.dataset,
+                                      server_dataset_size = server_dataset_size,
+                                      server_dataset_type = 'data')
+
     super().__init__(fraction_fit=1, 
 		    min_available_clients=self.n_clients, 
 		    min_fit_clients=self.n_clients, 
 		    min_evaluate_clients=self.n_clients)
     
-    if dataset == 'MNIST':
-      (x_servidor, _), (_, _) = tf.keras.datasets.mnist.load_data()
-      x_servidor = x_servidor/255.0
-      x_servidor = x_servidor[list(np.random.random_integers(1,60000-1, 1000))]
-      self.x_servidor = x_servidor#.reshape(x_servidor.shape[0] , 28*28)
-
-    if dataset == 'EMNIST':
-      (x_servidor, _), (_, _) =  tfds.as_numpy(tfds.load(
-													'emnist/balanced',
-													split=['train', 'test'],
-													batch_size=-1,
-													as_supervised=True,
-												))
-      x_servidor = x_servidor/255.0
-      x_servidor = x_servidor[list(np.random.random_integers(1,100000-1, 1000))]
-      self.x_servidor = x_servidor#.reshape(x_servidor.shape[0] , 28*28) 
-
-    if dataset == 'CIFAR10':
-      (x_servidor, _), (_, _) = tf.keras.datasets.cifar10.load_data()
-      x_servidor = x_servidor/255.0
-      x_servidor = x_servidor[list(np.random.random_integers(1,50000-1, 1000))]
-      self.x_servidor = x_servidor#.reshape(x_servidor.shape[0] , 28*28) 
-
-    if dataset == 'MotionSense':
-      for cid in range(n_clients):
-        with open(f'data/motion_sense/{cid+1}_train.pickle', 'rb') as train_file:
-          if cid == 0:
-            train = pd.read_pickle(train_file)   
-            train = train.sample(100)
-          else:
-             train = pd.concat([train,  pd.read_pickle(train_file).sample(100)],
-                                ignore_index=True, sort = False)
-               
-      train.drop('activity', axis=1, inplace=True)
-      train.drop('subject', axis=1, inplace=True)
-      train.drop('trial', axis=1, inplace=True)
-      self.x_servidor = train.values
-      #self.x_servidor = np.random.uniform(0,1,size = (1000,7))
-
-    if dataset == 'ExtraSensory':
-
-      for cid in range(n_clients):
-        with open(f'data/ExtraSensory/x_train_client_{cid+1}.pickle', 'rb') as train_file:
-          if cid == 0:
-            train = pd.read_pickle(train_file)   
-            train = train[:20]
-          else:
-             train = np.append(train,  pd.read_pickle(train_file)[:20],
-                                axis = 0)
-             
-          self.x_servidor = train
-
+    
   def aggregate_fit(self, server_round, results, failures):
 
     def create_model(self):
