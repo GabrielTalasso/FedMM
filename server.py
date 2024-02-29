@@ -171,6 +171,10 @@ class FedMM(fl.server.strategy.FedAvg):
       w = lista_modelos['models'][str(idx_cluster)][-1]#
       modelo.set_weights(w)#
       activation_last = get_layer_outputs(modelo, modelo.layers[self.metric_layer], self.x_servidor, 0)#
+      #filename = 'teste/teste.txt'
+      #os.makedirs(os.path.dirname(filename), exist_ok=True)
+      #with open(filename, "a") as f:
+      #	f.write(f"{modelo.layers}\n")
       lista_last.append(activation_last)#
       lista_last_layer.append(modelo.layers[self.metric_layer].weights[0].numpy().flatten())#
 

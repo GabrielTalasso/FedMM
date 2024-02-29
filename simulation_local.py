@@ -21,18 +21,18 @@ except FileNotFoundError:
 dataset_name = 'CIFAR10'
 selection_method = 'All' #Random, POC, All, Less_Selected
 cluster_metric = 'CKA' #CKA, weights
-metric_layer = -1 #-1, -2, 1
-cluster_method = 'HC' #Affinity, HC, KCenter, Random
+metric_layer = -2 #-1, -2, 1
+cluster_method = 'Random' #Affinity, HC, KCenter, Random
 POC_perc_of_clients = 0.5
-n_clients = 20
-n_rounds = 20
-n_clusters = 4
+n_clients = 10
+n_rounds = 10
+n_clusters = 3
 clustering = True
-cluster_round = 5
+cluster_round = 3
 dir_alpha = 0.1
 dataset_n_classes = 10
 model_name = 'CNN'
-dataset_size = 5000
+dataset_size = 1000
 
 def funcao_cliente(cid):
 	return ClientBase(int(cid), n_clients=n_clients,

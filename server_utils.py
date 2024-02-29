@@ -164,11 +164,20 @@ def make_clusters(matrix, plot_dendrogram , n_clients, n_clusters,
 
 ####################### for similarity
 
+def flatten_elements(array):
+    shape = array.shape
+    new_shape = (shape[0], np.product(shape[1:]))
+    return array.reshape(new_shape)
+
 def get_layer_outputs(model, layer, input_data, learning_phase=1):
     layer_fn = K.function(model.input, layer.output)
     return layer_fn(input_data)
 
 def cka(X, Y):
+
+    # if len(X.shape) > 2:
+    #     X = flatten_elements(X)
+    #     Y = flatten_elements(Y)
 
     # Implements linear CKA as in Kornblith et al. (2019)
     X = X.copy()

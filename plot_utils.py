@@ -7,8 +7,10 @@ sns.set()
 
 dataset = 'CIFAR10'
 alpha = '0.1'
+n_clients = 10
+n_clusters = 3
 
-data = pd.read_csv(f'local_logs/{dataset}/alpha_{alpha}/CKA-(-1)-HC-All-0.5/evaluate/acc_20clients_4clusters.csv',
+data = pd.read_csv(f'local_logs/{dataset}/alpha_{alpha}/CKA-(-2)-HC-All-0.5/evaluate/acc_{n_clients}clients_{n_clusters}clusters.csv',
                     names = ['round', 'cid', 'acc', 'loss'])
 
 plot = sns.lineplot(data.groupby('round').mean(), y = 'acc', x = 'round')
@@ -16,7 +18,7 @@ plt.ylabel("Acuracy")
 plt.xlabel("Rounds")
 plt.show()
 
-data = pd.read_csv(f'local_logs/{dataset}/alpha_{alpha}/CKA-(-1)-Random-All-0.5/evaluate/acc_20clients_4clusters.csv',
+data = pd.read_csv(f'local_logs/{dataset}/alpha_{alpha}/CKA-(-2)-Random-All-0.5/evaluate/acc_{n_clients}clients_{n_clusters}clusters.csv',
                     names = ['round', 'cid', 'acc', 'loss'])
 
 plot = sns.lineplot(data.groupby('round').mean(), y = 'acc', x = 'round')
@@ -24,7 +26,7 @@ plt.ylabel("Acuracy")
 plt.xlabel("Rounds")
 plt.show()
 
-# data = pd.read_csv(f'local_logs/{dataset}/alpha_{alpha}/CKA-(-1)-HC-All-0.5/evaluate/acc_30clients_1clusters.csv',
+# data = pd.read_csv(f'local_logs/{dataset}/alpha_{alpha}/CKA-(-1)-HC-All-0.5/evaluate/acc_{n_clients}clients_1clusters.csv',
 #                     names = ['round', 'cid', 'acc', 'loss'])
 
 # plot = sns.lineplot(data.groupby('round').mean(), y = 'acc', x = 'round')
