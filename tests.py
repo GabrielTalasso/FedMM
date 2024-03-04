@@ -1,24 +1,21 @@
 import numpy as np
+import matplotlib.pyplot as plt
+from scipy import spatial as spc
+from scipy.cluster.hierarchy import dendrogram, linkage, fcluster
 
-a = np.array([[[1,3], [2,3]], 
-                [[1,3], [2,3]],
-                [[1,3], [2,3]]])
+matrix = np.array([ [1,  0.1, 0.1, 0.1],
+                    [0.1, 1, 0.5, 0.9],
+                    [0.1, 0.5, 1, 0.9],
+                    [0.1, 0.9, 0.9, 1]])
 
-# new_a = np.array()
-
-# for i in range(len(a)):
-#     np.append(new_a[i], a[i].flatten())
-
-# print(a.shape)
+pdist = spc.distance.pdist(matrix)
+sqf = spc.distance.squareform(pdist)
 
 
-# print(len(a.shape))
-# print(a)
+linkage = linkage(pdist, method='ward')
+idx = fcluster(linkage, 0.75, 'distance')
 
-def flatten_elements(array):
-    shape = array.shape
-    new_shape = (shape[0], np.product(shape[1:]))
-    return array.reshape(new_shape)
+dendrogram(linkage, color_threshold=0.75)
+plt.savefig('test_dendrogram.png')
 
-print(flatten_elements(a).shape,
-        flatten_elements(a))
+print(matrix, pdist,'\n', sqf)
