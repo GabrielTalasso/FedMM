@@ -96,7 +96,6 @@ def server_Hclusters(matrix, plot_dendrogram , n_clients, n_clusters,
         dendrogram(linkage, color_threshold=th)
         #plt.savefig(f'results/clusters_{dataset}_{n_clients}clients_{n_clusters}clusters.png')
         plt.savefig(path+f'clusters_{n_clients}clients_{n_clusters}clusters.png')
-
     
     return idx
 

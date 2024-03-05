@@ -21,7 +21,7 @@ from sys import getsizeof
 class ClientBase(fl.client.NumPyClient):
 
 	def __init__(self, cid, dataset, n_clients, model_name, local_epochs,
-	      n_rounds, n_clusters, selection_method, cluster_metric, 
+	      n_rounds, n_clusters, selection_method, cluster_metric, cluster_round, 
 		  cluster_method, metric_layer = -1, 
 		  POC_perc_of_clients = 0.5,
 		  dir_alpha = 100,
@@ -45,6 +45,7 @@ class ClientBase(fl.client.NumPyClient):
 		self.cluster_metric = cluster_metric
 		self.metric_layer = metric_layer
 		self.cluster_method = cluster_method
+		self.cluster_round = cluster_round
 
 		self.n_rounds = n_rounds
 		self.n_clusters = n_clusters
@@ -85,8 +86,10 @@ class ClientBase(fl.client.NumPyClient):
 	def fit(self, parameters, config):
 
 		self.model.set_weights(parameters)
+
+
 		h = self.model.fit(self.x_train, self.y_train, 
-		                    validation_data = (self.x_test, self.y_test),
+							validation_data = (self.x_test, self.y_test),
 							verbose=1, epochs=self.local_epochs)
 
 		msg2server = {

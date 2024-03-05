@@ -23,17 +23,17 @@ selection_method = 'All' #Random, POC, All, Less_Selected
 cluster_metric = 'CKA' #CKA, weights
 metric_layer = -1 #-1, -2, 1
 cluster_method = 'HC' #Affinity, HC, KCenter, Random
-POC_perc_of_clients = 0.5
-n_clients = 30
+POC_perc_of_clients = 0.55
+n_clients = 50
 n_rounds = 50
-n_clusters = 25
+n_clusters = 10
 clustering = True
 cluster_round = 5
 dir_alpha = 0.1
 dataset_n_classes = 10
 model_name = 'CNN'
 dataset_size = 1000
-server_dataset_type = 'noise'
+server_dataset_type = 'data'
 server_dataset_size = 1000
 
 
@@ -44,6 +44,7 @@ def funcao_cliente(cid):
 			selection_method = selection_method, 
 			POC_perc_of_clients = POC_perc_of_clients,
 			cluster_metric = cluster_metric,
+			cluster_round = cluster_round,
 			metric_layer = metric_layer,
 			cluster_method = cluster_method,
 			dir_alpha = dir_alpha,
