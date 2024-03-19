@@ -1,5 +1,6 @@
 from client import ClientBase
 from server import FedMM
+from server_dynamic import FedMM_dynamic
 import pickle
 import flwr as fl
 import os
@@ -23,12 +24,12 @@ selection_method = 'All' #Random, POC, All, Less_Selected
 cluster_metric = 'CKA' #CKA, weights
 metric_layer = -1 #-1, -2, 1
 cluster_method = 'HC' #Affinity, HC, KCenter, Random
-POC_perc_of_clients = 0.55
-n_clients = 50
-n_rounds = 50
-n_clusters = 10
+POC_perc_of_clients = 0.5
+n_clients = 10
+n_rounds = 12
+n_clusters = 3
 clustering = True
-cluster_round = 5
+cluster_round = [3,6,9]
 dir_alpha = 0.1
 dataset_n_classes = 10
 model_name = 'CNN'
@@ -53,8 +54,8 @@ def funcao_cliente(cid):
 
 history = fl.simulation.start_simulation(client_fn=funcao_cliente, 
 								num_clients=n_clients, 
-								strategy=FedMM(model_name=model_name,  n_clients = n_clients, 
-			     									clustering = clustering, clustering_round = cluster_round, 
+								strategy=FedMM_dynamic(model_name=model_name,  n_clients = n_clients, 
+			     									clustering = clustering, clustering_rounds = cluster_round, 
 													n_clusters = n_clusters, dataset=dataset_name, fraction_fit=1, 
 													selection_method = selection_method, 
 													POC_perc_of_clients = POC_perc_of_clients,

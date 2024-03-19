@@ -1,21 +1,16 @@
 import numpy as np
+import pandas as pd 
+import seaborn as sns
 import matplotlib.pyplot as plt
 from scipy import spatial as spc
 from scipy.cluster.hierarchy import dendrogram, linkage, fcluster
 
-matrix = np.array([ [1,  0.1, 0.1, 0.1],
-                    [0.1, 1, 0.5, 0.9],
-                    [0.1, 0.5, 1, 0.9],
-                    [0.1, 0.9, 0.9, 1]])
+data = pd.read_csv(f'/home/gabriel.talasso/FedMM/local_logs/CIFAR10/alpha_0.1/CKA-(-1)-HC-All-0.5/evaluate/acc_10clients_3clusters.csv',
+                    names = ['round', 'cid', 'acc', 'loss'])
 
-pdist = spc.distance.pdist(matrix)
-sqf = spc.distance.squareform(pdist)
+plot = sns.lineplot(data.groupby('round').mean(), y = 'acc', x = 'round', label = 'HC-10e')
+plt.ylabel("Acuracy")
+plt.xlabel("Rounds")
+plt.show()
 
-
-linkage = linkage(pdist, method='ward')
-idx = fcluster(linkage, 0.75, 'distance')
-
-dendrogram(linkage, color_threshold=0.75)
-plt.savefig('test_dendrogram.png')
-
-print(matrix, pdist,'\n', sqf)
+plt.savefig('figures/teste.png')

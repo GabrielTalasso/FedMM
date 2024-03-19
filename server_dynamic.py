@@ -35,10 +35,10 @@ from model_definition import ModelCreation
 
 from sys import getsizeof
 
-class FedMM(fl.server.strategy.FedAvg):
+class FedMM_dynamic(fl.server.strategy.FedAvg):
 
   def __init__(self, model_name, n_clients,
-                clustering, clustering_round, dataset, 
+                clustering, clustering_rounds, dataset, 
                 fraction_fit, selection_method, cluster_metric,
                 cluster_method,
                 metric_layer = -1,
@@ -55,7 +55,7 @@ class FedMM(fl.server.strategy.FedAvg):
     self.n_clusters = n_clusters
     self.n_clients = n_clients
     self.clustering = clustering
-    self.clustering_round = clustering_round
+    self.clustering_rounds = clustering_rounds
     self.dataset = dataset
     self.dataset_n_classes = dataset_n_classes
     self.dir_alpha = dir_alpha
@@ -124,10 +124,6 @@ class FedMM(fl.server.strategy.FedAvg):
       w = lista_modelos['models'][str(idx_cluster)][-1]#
       modelo.set_weights(w)#
       activation_last = get_layer_outputs(modelo, modelo.layers[self.metric_layer], self.x_servidor, 0)#
-      #filename = 'teste/teste.txt'
-      #os.makedirs(os.path.dirname(filename), exist_ok=True)
-      #with open(filename, "a") as f:
-      #	f.write(f"{modelo.layers}\n")
       lista_last.append(activation_last)#
       lista_last_layer.append(modelo.layers[self.metric_layer].weights[0].numpy().flatten())#
 
@@ -135,12 +131,13 @@ class FedMM(fl.server.strategy.FedAvg):
     lista_modelos['last_layer'] = lista_last_layer
 
     #similarity between clients (construct the similatity matrix)
-    if (server_round == self.clustering_round-1) or (server_round == self.clustering_round):
-      matrix = calcule_similarity(models = lista_modelos, metric = self.cluster_metric)
+    if (server_round == 1) or (server_round in self.clustering_rounds):
+        matrix = calcule_similarity(models = lista_modelos,
+                                    metric = self.cluster_metric)
         
     #use some clustering method in similarity metrix
     if self.clustering:
-      if (server_round == self.clustering_round-1) or (server_round == self.clustering_round):
+      if server_round in self.clustering_rounds:
         self.idx = make_clusters(matrix = matrix,
                                 clustering_method = self.cluster_method,
                                 models = lista_last_layer,
@@ -148,7 +145,7 @@ class FedMM(fl.server.strategy.FedAvg):
                                 n_clients = self.n_clients,
                                 n_clusters=self.n_clusters, 
                                 server_round = server_round,
-                                cluster_round = self.clustering_round,
+                                clustering_rounds = self.clustering_rounds,
                                 path = f'local_logs/{self.dataset}/alpha_{self.dir_alpha}/{self.cluster_metric}-({self.metric_layer})-{self.cluster_method}-{self.selection_method}-{self.POC_perc_of_clients}/')
 
         filename = f"local_logs/{self.dataset}/alpha_{self.dir_alpha}/{self.cluster_metric}-({self.metric_layer})-{self.cluster_method}-{self.selection_method}-{self.POC_perc_of_clients}/clusters_{self.n_clients}clients_{self.n_clusters}clusters.csv"
@@ -207,7 +204,7 @@ class FedMM(fl.server.strategy.FedAvg):
             selection = self.selection_method,
             idx = self.idx, 
             server_round = server_round,
-            cluster_round = self.clustering_round,
+            clustering_rounds = self.clustering_rounds,
             POC_perc_of_clients = self.POC_perc_of_clients,
             acc = self.acc,
             times_selected=self.times_selected,
@@ -220,13 +217,13 @@ class FedMM(fl.server.strategy.FedAvg):
         config = {"round" : server_round}
 
         if server_round == 1:
-           fit_ins = FitIns(parameters, config)
-           return [(client, fit_ins) for client in clients]
+            fit_ins = FitIns(parameters, config)
+            return [(client, fit_ins) for client in clients]
         
-        elif server_round <= self.clustering_round:
-           fit_ins = FitIns(parameters['0.0'], config)
-           return [(client, fit_ins) for client in clients]
-        
+        elif server_round <= np.min(self.clustering_rounds)+1:
+            fit_ins = FitIns(parameters['0.0'], config)
+            return [(client, fit_ins) for client in clients]   
+
         else:
           return [(client, FitIns(parameters[str(self.idx[int(client.cid)])], config)) for client in clients]
   
@@ -251,8 +248,9 @@ class FedMM(fl.server.strategy.FedAvg):
         evaluate_ins = EvaluateIns(parameters['0.0'], config)
         return [(client, evaluate_ins) for client in clients]
       
-      elif server_round == self.clustering_round-1:
+      elif server_round <= np.min(self.clustering_rounds):
         evaluate_ins = EvaluateIns(parameters['0.0'], config)
-        return [(client, evaluate_ins) for client in clients]      
+        return [(client, evaluate_ins) for client in clients]  
+
       else:
         return [(client, EvaluateIns(parameters[str(self.idx[int(client.cid)])], config)) for client in clients]

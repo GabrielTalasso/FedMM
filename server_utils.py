@@ -8,10 +8,8 @@ import pandas as pd
 import tensorflow as tf
 import tensorflow_datasets as tfds
 
-import numpy as np
 import random
 import threading
-import numpy as np
 import math
 from abc import ABC, abstractmethod
 from logging import INFO
@@ -73,7 +71,7 @@ class GreedyKCenter(object):
         return np.sqrt(displacement.dot(displacement))
 
 def server_Hclusters(matrix, plot_dendrogram , n_clients, n_clusters,
-                    server_round, cluster_round, path):
+                    server_round, clustering_rounds, path):
 
     pdist = spc.distance.pdist(matrix)
     linkage = spc.linkage(pdist, method='ward')
@@ -88,32 +86,16 @@ def server_Hclusters(matrix, plot_dendrogram , n_clients, n_clusters,
         if le == n_clusters:
             th = i
 
-    idx = spc.fcluster(linkage, th, 'distance' )
+    idx = spc.fcluster(linkage, th, 'distance')
     print(idx)
 
-    if plot_dendrogram and (server_round == cluster_round):
+    if plot_dendrogram and (server_round in clustering_rounds):
 
         dendrogram(linkage, color_threshold=th)
         #plt.savefig(f'results/clusters_{dataset}_{n_clients}clients_{n_clusters}clusters.png')
-        plt.savefig(path+f'clusters_{n_clients}clients_{n_clusters}clusters.png')
+        os.makedirs(os.path.dirname(path+'/dendrograms/'), exist_ok=True)
+        plt.savefig(path+f'/dendrograms/clusters_{n_clients}clients_{n_clusters}clusters_round{server_round}.png')
     
-    return idx
-
-def server_Hclusters2(matrix, plot_dendrogram = False):
-
-    pdist = spc.distance.pdist(matrix)
-    linkage = spc.linkage(pdist, method='ward')
-
-    max_link = linkage[-1][2]
-    t = max_link/3 #como escolher?
-    
-    idx = spc.fcluster(linkage, t = t, criterion = 'distance')
-    print(idx)
-
-    if plot_dendrogram:
-        dendrogram(linkage)
-        plt.show()
-
     return idx
 
 def server_AffinityClustering(matrix):
@@ -137,7 +119,7 @@ def server_KCenterClustering(weights, k):
 
 
 def make_clusters(matrix, plot_dendrogram , n_clients, n_clusters,
-                    server_round, cluster_round, path, 
+                    server_round, clustering_rounds, path, 
                     clustering_method, models):
     
     if clustering_method == 'Affinity':
@@ -147,7 +129,7 @@ def make_clusters(matrix, plot_dendrogram , n_clients, n_clusters,
     if clustering_method == 'HC':
         idx = server_Hclusters(matrix = matrix, plot_dendrogram=plot_dendrogram,
                                   n_clients=n_clients, n_clusters=n_clusters, 
-                                  server_round = server_round, cluster_round=cluster_round,
+                                  server_round = server_round, clustering_rounds=clustering_rounds,
                                   path = path)
         return idx
           
@@ -236,7 +218,7 @@ def sample(
     decay_factor = None,
     server_round = None,
     idx = None,
-    cluster_round = 0,
+    clustering_rounds = [0],
     POC_perc_of_clients = 0.5,
     times_selected = []):
     
@@ -265,7 +247,7 @@ def sample(
     sampled_cids = available_cids.copy()
                 
     
-    if (idx is not None) and (server_round>cluster_round) and CL:        
+    if (idx is not None) and (server_round>np.min(clustering_rounds)) and CL:        
         selected_clients = []
         for cluster_idx in np.unique(idx): #passa por todos os clusters
             cluster = []
@@ -305,7 +287,7 @@ def sample(
                         selected_clients_cluster.append(str(cluster[idx_accuracy]))
 
                 if decay_factor > 0:
-                    the_chosen_ones  = len(selected_clients_cluster) * (1 - decay_factor)**int(server_round-cluster_round)
+                    the_chosen_ones  = len(selected_clients_cluster) * (1 - decay_factor)**int(server_round-np.min(clustering_rounds))
                     selected_clients_cluster = selected_clients_cluster[ : math.ceil(the_chosen_ones)]
                 
                 selected_clients = selected_clients + selected_clients_cluster
