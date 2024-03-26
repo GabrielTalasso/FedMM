@@ -26,7 +26,8 @@ class ClientBase(fl.client.NumPyClient):
 		  POC_perc_of_clients = 0.5,
 		  dir_alpha = 100,
 		  dataset_size = 1000,
-		  dataset_n_classes = 10):
+		  dataset_n_classes = 10,
+		  simulation_alias = 'simulation'):
 
 		self.cid = cid
 		self.n_clients = n_clients
@@ -46,6 +47,7 @@ class ClientBase(fl.client.NumPyClient):
 		self.metric_layer = metric_layer
 		self.cluster_method = cluster_method
 		self.cluster_round = cluster_round
+		self.simulation_alias = simulation_alias
 
 		self.n_rounds = n_rounds
 		self.n_clusters = n_clusters
@@ -63,7 +65,7 @@ class ClientBase(fl.client.NumPyClient):
 
 		classes, counts = np.unique(self.y_train, return_counts=True)
 
-		filename = f'local_logs/{self.dataset}/alpha_{self.dir_alpha}/{self.cluster_metric}-({self.metric_layer})-{self.cluster_method}-{self.selection_method}-{self.POC_perc_of_clients}'
+		filename = f'local_logs/{self.dataset}/alpha_{self.dir_alpha}/{self.simulation_alias}-{self.cluster_metric}-({self.metric_layer})-{self.cluster_method}-{self.selection_method}-{self.POC_perc_of_clients}'
 		filename = f"{filename}/class_quantities_{self.n_clients}clients_{self.n_clusters}clusters.csv"
 		os.makedirs(os.path.dirname(filename), exist_ok=True)
 		with open(filename, "a") as f:
@@ -97,7 +99,7 @@ class ClientBase(fl.client.NumPyClient):
 		}
 		self.round = config['round']
 	
-		filename = f"local_logs/{self.dataset}/alpha_{self.dir_alpha}/{self.cluster_metric}-({self.metric_layer})-{self.cluster_method}-{self.selection_method}-{self.POC_perc_of_clients}/train/acc_{self.n_clients}clients_{self.n_clusters}clusters.csv"
+		filename = f"local_logs/{self.dataset}/alpha_{self.dir_alpha}/{self.simulation_alias}-{self.cluster_metric}-({self.metric_layer})-{self.cluster_method}-{self.selection_method}-{self.POC_perc_of_clients}/train/acc_{self.n_clients}clients_{self.n_clusters}clusters.csv"
 		os.makedirs(os.path.dirname(filename), exist_ok=True)
 		with open(filename, 'a') as arquivo:
 			arquivo.write(f"{config['round']}, {self.cid}, {np.mean(h.history['accuracy'])}, {np.mean(h.history['loss'])}\n")
@@ -109,7 +111,7 @@ class ClientBase(fl.client.NumPyClient):
 		self.model.set_weights(parameters)
 
 		loss, accuracy = self.model.evaluate(self.x_test, self.y_test)
-		filename = f"local_logs/{self.dataset}/alpha_{self.dir_alpha}/{self.cluster_metric}-({self.metric_layer})-{self.cluster_method}-{self.selection_method}-{self.POC_perc_of_clients}/evaluate/acc_{self.n_clients}clients_{self.n_clusters}clusters.csv"
+		filename = f"local_logs/{self.dataset}/alpha_{self.dir_alpha}/{self.simulation_alias}-{self.cluster_metric}-({self.metric_layer})-{self.cluster_method}-{self.selection_method}-{self.POC_perc_of_clients}/evaluate/acc_{self.n_clients}clients_{self.n_clusters}clusters.csv"
 		os.makedirs(os.path.dirname(filename), exist_ok=True)
 		with open(filename, 'a') as arquivo:
 			arquivo.write(f"{config['round']}, {self.cid}, {accuracy}, {loss}\n")

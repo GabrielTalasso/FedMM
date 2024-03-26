@@ -91,11 +91,12 @@ def server_Hclusters(matrix, plot_dendrogram , n_clients, n_clusters,
 
     if plot_dendrogram and (server_round in clustering_rounds):
 
+        fig = plt.figure()
         dendrogram(linkage, color_threshold=th)
         #plt.savefig(f'results/clusters_{dataset}_{n_clients}clients_{n_clusters}clusters.png')
         os.makedirs(os.path.dirname(path+'/dendrograms/'), exist_ok=True)
         plt.savefig(path+f'/dendrograms/clusters_{n_clients}clients_{n_clusters}clusters_round{server_round}.png')
-    
+        plt.show()
     return idx
 
 def server_AffinityClustering(matrix):

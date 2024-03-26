@@ -48,8 +48,8 @@ class FedMM(fl.server.strategy.FedAvg):
                 dataset_n_classes = 10,
                 dir_alpha = 100,
                 server_dataset_size = 1000,
-                server_dataset_type = 'data'
-                ):
+                server_dataset_type = 'data',
+                simulation_alias = 'simulation'):
 
     self.model_name = model_name
     self.n_clusters = n_clusters
@@ -65,6 +65,7 @@ class FedMM(fl.server.strategy.FedAvg):
     self.cluster_metric = cluster_metric
     self.metric_layer = metric_layer
     self.cluster_method = cluster_method
+    self.simulation_alias = simulation_alias
 
     self.decay_factor = decay_factor
 
@@ -149,9 +150,9 @@ class FedMM(fl.server.strategy.FedAvg):
                                 n_clusters=self.n_clusters, 
                                 server_round = server_round,
                                 cluster_round = self.clustering_round,
-                                path = f'local_logs/{self.dataset}/alpha_{self.dir_alpha}/{self.cluster_metric}-({self.metric_layer})-{self.cluster_method}-{self.selection_method}-{self.POC_perc_of_clients}/')
+                                path = f'local_logs/{self.dataset}/alpha_{self.dir_alpha}/{self.simulation_alias}-{self.cluster_metric}-({self.metric_layer})-{self.cluster_method}-{self.selection_method}-{self.POC_perc_of_clients}/')
 
-        filename = f"local_logs/{self.dataset}/alpha_{self.dir_alpha}/{self.cluster_metric}-({self.metric_layer})-{self.cluster_method}-{self.selection_method}-{self.POC_perc_of_clients}/clusters_{self.n_clients}clients_{self.n_clusters}clusters.csv"
+        filename = f"local_logs/{self.dataset}/alpha_{self.dir_alpha}/{self.simulation_alias}-{self.cluster_metric}-({self.metric_layer})-{self.cluster_method}-{self.selection_method}-{self.POC_perc_of_clients}/clusters_{self.n_clients}clients_{self.n_clusters}clusters.csv"
         os.makedirs(os.path.dirname(filename), exist_ok=True)
         with open(filename, 'a') as arq:
           for i in range(len(self.idx)):
